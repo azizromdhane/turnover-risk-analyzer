@@ -1,0 +1,151 @@
+﻿Employee_ID,Name,Department,Job_Position,Tenure,Salary,Salary_Evolution,Absenteeism,Satisfaction,Workload,Overtime,Career_Progression
+EMP-001,Mehdi Mansouri,Production,Technicien,17.2,2650,5.5,8,3.7,3.6,15,3.4
+EMP-002,Slim Zouari,Production,Opérateur,2.1,2500,9.5,5,5.0,1.7,0,4.4
+EMP-003,Salma Bouzid,IT,Administrateur systèmes,2.1,4120,7.3,3,4.3,1.8,11,2.2
+EMP-004,Ons Khelifi,Production,Technicien,1.8,2140,5.0,14,3.3,3.2,20,2.3
+EMP-005,Nour Zouari,RH,Assistant RH,6.2,3770,8.2,3,3.6,1.6,0,4.2
+EMP-006,Mehdi Chaabane,Production,Opérateur,3.6,2240,6.1,9,4.7,1.0,16,3.3
+EMP-007,Salma Hamdi,Ventes,Commercial,9.2,3220,1.8,15,1.6,2.9,32,2.6
+EMP-008,Sarra Bouazizi,RH,Chargé de recrutement,0.6,3230,5.7,1,3.6,1.7,7,3.1
+EMP-009,Ons Trabelsi,Finance,Analyste financier,6.2,4280,8.5,2,4.5,1.0,2,4.7
+EMP-010,Rania Ferchichi,Ventes,Responsable ventes,0.4,2510,8.7,3,3.9,2.7,3,3.6
+EMP-011,Ines Haddad,IT,Administrateur systèmes,1.4,3650,2.2,17,1.1,4.7,32,1.0
+EMP-012,Walid Sassi,Ventes,Commercial,0.7,2800,7.5,3,3.6,1.1,19,4.6
+EMP-013,Rania Dridi,Production,Technicien,0.5,2230,4.3,7,3.5,2.8,10,2.6
+EMP-014,Yasmine Bouazizi,Finance,Contrôleur de gestion,1.1,3390,3.8,10,2.7,3.9,14,2.0
+EMP-015,Mohamed Trabelsi,Finance,Comptable,0.6,3450,5.1,11,1.0,4.0,27,1.4
+EMP-016,Mariem Nasri,Ventes,Commercial,1.0,2640,5.5,12,2.6,2.3,16,2.3
+EMP-017,Mehdi Ayadi,RH,Gestionnaire paie,6.7,3710,2.3,11,2.4,4.7,18,1.9
+EMP-018,Amine Gharbi,RH,Chargé de recrutement,0.5,3100,4.6,12,3.0,3.4,23,3.2
+EMP-019,Oussama Nasri,Ventes,Assistant commercial,11.3,3280,7.8,0,5.0,1.7,8,3.3
+EMP-020,Oussama Ferchichi,Production,Technicien,9.8,2660,6.3,1,4.3,3.2,7,3.2
+EMP-021,Yasmine Nasri,Finance,Comptable,1.0,3100,5.7,13,4.0,2.9,14,2.0
+EMP-022,Meriem Bouzid,Finance,Comptable,1.5,3560,10.0,0,5.0,1.3,8,3.5
+EMP-023,Ines Jebali,Finance,Comptable,8.2,3600,5.7,3,4.3,1.1,8,4.3
+EMP-024,Hela Ayadi,Production,Chef d'équipe,0.5,2120,5.8,9,3.4,2.9,19,2.5
+EMP-025,Ons Ferchichi,Marketing,Responsable marketing,8.6,3350,6.6,4,4.3,1.0,9,4.5
+EMP-026,Hela Gharbi,Marketing,Community manager,2.8,3280,3.7,11,2.6,3.3,23,1.0
+EMP-027,Sami Mansouri,Finance,Comptable,17.5,4620,3.6,10,2.3,3.8,23,1.0
+EMP-028,Amel Ben Ali,IT,Administrateur systèmes,0.6,3920,7.7,1,5.0,2.8,13,3.6
+EMP-029,Walid Belhaj,Ventes,Assistant commercial,3.2,2940,4.4,8,2.6,3.0,5,4.5
+EMP-030,Mariem Khelifi,Finance,Contrôleur de gestion,8.4,4250,5.4,7,3.9,2.1,16,3.6
+EMP-031,Sami Dridi,IT,Administrateur systèmes,1.6,4420,4.4,11,2.6,4.3,27,1.8
+EMP-032,Mohamed Zouari,Finance,Comptable,13.3,4410,8.8,6,4.6,2.2,10,3.9
+EMP-033,Nour Mejri,Production,Opérateur,1.3,2580,4.7,3,3.8,3.2,1,4.7
+EMP-034,Fatma Mansouri,Ventes,Responsable ventes,7.0,2990,6.3,6,5.0,1.6,8,4.3
+EMP-035,Hela Jebali,Production,Opérateur,0.8,2020,3.0,14,3.2,4.0,19,2.9
+EMP-036,Rania Belhaj,RH,Assistant RH,17.2,4100,1.9,14,2.4,4.6,31,2.4
+EMP-037,Rania Hamdi,Finance,Contrôleur de gestion,1.4,3180,5.4,6,3.9,2.6,6,3.8
+EMP-038,Rami Zouari,Ventes,Commercial,1.6,3060,8.9,4,5.0,2.1,0,4.8
+EMP-039,Oussama Dridi,Marketing,Chargé marketing,1.3,2980,4.3,14,2.2,3.6,23,3.3
+EMP-040,Karim Jebali,Finance,Comptable,16.7,4510,3.2,9,3.8,4.4,26,3.0
+EMP-041,Sarra Zouari,Production,Chef d'équipe,1.2,2430,0.7,21,1.6,4.8,39,3.3
+EMP-042,Sami Nasri,Production,Opérateur,12.3,3000,4.0,18,1.9,5.0,28,3.0
+EMP-043,Meriem Jebali,Production,Opérateur,4.2,2370,4.0,5,2.8,3.5,18,2.9
+EMP-044,Nour Jebali,Production,Technicien,3.7,2320,4.9,6,3.7,2.2,12,3.1
+EMP-045,Mohamed Belhaj,IT,Administrateur systèmes,2.4,4380,4.3,4,5.0,1.0,0,4.9
+EMP-046,Slim Bouazizi,Marketing,Chargé marketing,10.6,4270,1.9,18,1.7,4.3,24,3.2
+EMP-047,Walid Ferchichi,Marketing,Chargé marketing,3.9,3530,6.5,4,4.3,2.4,8,4.4
+EMP-048,Ines Dridi,RH,Gestionnaire paie,2.7,3220,7.0,5,4.2,1.7,0,3.3
+EMP-049,Oussama Bouazizi,Ventes,Responsable ventes,3.6,2650,7.1,2,4.3,2.4,6,4.8
+EMP-050,Fatma Bouzid,Production,Technicien,14.0,3170,1.8,17,2.9,5.0,30,2.0
+EMP-051,Mariem Hamdi,RH,Assistant RH,6.4,3830,7.5,7,5.0,1.1,15,3.9
+EMP-052,Karim Zouari,IT,Développeur,1.8,4070,7.5,6,4.9,1.0,10,4.9
+EMP-053,Fatma Ben Ali,Finance,Comptable,3.9,4090,6.7,13,3.9,3.1,14,2.6
+EMP-054,Karim Karray,Marketing,Chargé marketing,2.0,2980,10.7,0,5.0,1.7,6,3.5
+EMP-055,Salma Bouazizi,IT,Développeur,1.2,4020,5.4,3,4.4,1.0,9,4.1
+EMP-056,Rami Khelifi,Production,Opérateur,4.1,2340,2.6,8,3.0,2.5,22,5.0
+EMP-057,Ons Ayadi,Ventes,Assistant commercial,2.6,2840,5.6,1,4.2,2.4,16,4.6
+EMP-058,Mariem Dridi,Marketing,Responsable marketing,5.6,3730,5.7,4,3.9,1.6,7,5.0
+EMP-059,Amel Zouari,RH,Gestionnaire paie,0.3,2720,3.4,8,3.3,4.4,9,2.1
+EMP-060,Yasmine Trabelsi,Ventes,Commercial,1.1,3050,5.5,2,4.8,2.1,11,4.0
+EMP-061,Meriem Bouazizi,Production,Technicien,3.5,2170,4.5,10,4.3,2.6,10,2.0
+EMP-062,Salma Karray,Marketing,Chargé marketing,6.9,3530,6.0,12,4.1,1.6,8,4.1
+EMP-063,Emna Bouzid,Finance,Analyste financier,1.1,3400,7.0,8,4.7,2.0,5,3.4
+EMP-064,Salma Zouari,Marketing,Community manager,6.3,3240,5.3,14,5.0,4.4,19,2.4
+EMP-065,Karim Ferchichi,IT,Support technique,2.5,3670,8.2,8,5.0,1.9,2,4.5
+EMP-066,Hela Chaabane,Production,Chef d'équipe,6.1,2810,2.8,10,3.4,3.9,19,3.0
+EMP-067,Sarra Ferchichi,Finance,Analyste financier,0.5,3680,5.8,9,2.7,1.5,19,4.2
+EMP-068,Mehdi Hamdi,RH,Assistant RH,0.6,2730,0.5,15,2.4,4.0,28,1.2
+EMP-069,Mohamed Jebali,IT,Développeur,8.1,5140,6.3,4,3.7,3.8,10,5.0
+EMP-070,Karim Gharbi,IT,Développeur,5.7,4410,6.2,8,4.7,2.2,16,3.1
+EMP-071,Nour Ben Ali,Finance,Contrôleur de gestion,1.4,3560,4.4,12,1.7,3.2,23,2.5
+EMP-072,Mariem Gharbi,Finance,Comptable,3.7,3860,2.8,16,2.4,3.7,22,1.9
+EMP-073,Nour Ferchichi,Finance,Contrôleur de gestion,0.3,3690,7.6,3,5.0,1.0,4,2.8
+EMP-074,Slim Ferchichi,Finance,Analyste financier,6.6,4380,8.5,1,4.3,1.0,0,4.1
+EMP-075,Meriem Karray,Finance,Analyste financier,2.7,3970,3.5,5,3.9,3.3,25,2.1
+EMP-076,Slim Khelifi,IT,Administrateur systèmes,1.1,3850,1.9,15,2.6,3.0,20,1.9
+EMP-077,Hichem Chaabane,RH,Chargé de recrutement,0.8,3130,9.1,7,4.6,2.0,8,5.0
+EMP-078,Hichem Ayadi,Finance,Comptable,4.3,3530,4.4,12,2.9,2.4,18,2.5
+EMP-079,Walid Mansouri,Production,Chef d'équipe,1.8,2300,3.4,13,2.0,4.1,36,2.0
+EMP-080,Oussama Khelifi,RH,Chargé de recrutement,3.9,3290,7.7,2,4.7,2.0,10,3.9
+EMP-081,Ahmed Zouari,IT,Support technique,0.8,3750,8.2,6,4.5,1.8,7,4.5
+EMP-082,Walid Bouzid,Finance,Contrôleur de gestion,1.0,3450,6.4,5,4.7,1.5,0,4.1
+EMP-083,Emna Dridi,Marketing,Community manager,1.9,2960,7.9,5,4.6,2.0,3,5.0
+EMP-084,Nour Chaabane,Finance,Comptable,17.5,4720,6.1,3,2.8,3.3,19,2.1
+EMP-085,Amine Ayadi,Ventes,Responsable ventes,2.8,2660,5.5,8,3.4,1.1,7,4.5
+EMP-086,Hichem Mansouri,Finance,Analyste financier,3.3,3400,7.1,1,4.2,1.4,11,4.3
+EMP-087,Ahmed Ayadi,Finance,Comptable,4.5,3320,6.4,8,3.3,1.8,10,4.4
+EMP-088,Sami Trabelsi,Production,Technicien,8.6,2990,6.6,3,5.0,2.3,6,2.2
+EMP-089,Ons Ben Ali,Ventes,Commercial,0.8,2460,4.6,5,2.7,3.2,21,2.2
+EMP-090,Hichem Bouazizi,IT,Administrateur systèmes,11.9,5160,3.0,4,3.9,3.3,24,3.2
+EMP-091,Sami Belhaj,Finance,Comptable,0.8,3120,4.8,18,2.9,3.0,24,2.8
+EMP-092,Yasmine Belhaj,Finance,Analyste financier,3.3,3400,9.6,3,3.4,1.4,4,4.9
+EMP-093,Mariem Ferchichi,IT,Support technique,0.3,4200,3.3,16,2.4,4.0,21,3.4
+EMP-094,Youssef Trabelsi,Finance,Comptable,2.0,3180,7.1,6,3.1,1.2,11,3.1
+EMP-095,Emna Hamdi,RH,Chargé de recrutement,5.9,3570,6.8,7,3.9,1.4,13,4.0
+EMP-096,Slim Gharbi,Finance,Contrôleur de gestion,5.9,4230,4.8,8,3.7,3.2,13,3.8
+EMP-097,Yasmine Khelifi,Finance,Analyste financier,1.8,3600,7.5,9,4.5,2.8,3,3.6
+EMP-098,Oussama Bouzid,IT,Support technique,13.3,4790,4.9,6,4.4,2.6,5,3.7
+EMP-099,Meriem Sassi,IT,Support technique,1.8,4110,10.1,7,5.0,1.8,0,5.0
+EMP-100,Rim Haddad,RH,Gestionnaire paie,2.6,2830,7.4,9,3.3,2.1,13,4.1
+EMP-101,Sarra Trabelsi,Ventes,Responsable ventes,0.5,2800,6.8,0,3.1,2.2,3,3.6
+EMP-102,Ons Karray,Marketing,Community manager,17.5,4150,9.5,2,5.0,1.0,7,5.0
+EMP-103,Fatma Nasri,Finance,Comptable,0.9,3290,7.5,3,4.5,1.2,10,4.9
+EMP-104,Ahmed Mansouri,Finance,Analyste financier,1.1,3190,4.0,13,3.6,2.7,20,2.4
+EMP-105,Slim Jebali,Marketing,Responsable marketing,1.3,2960,7.9,2,4.6,1.0,4,5.0
+EMP-106,Walid Hamdi,IT,Développeur,3.2,4120,6.5,9,4.7,3.5,11,4.2
+EMP-107,Fatma Zouari,RH,Gestionnaire paie,16.8,3640,1.3,14,2.9,4.8,24,2.6
+EMP-108,Youssef Sassi,Finance,Analyste financier,7.1,3880,8.2,4,4.4,1.8,1,4.5
+EMP-109,Mehdi Dridi,RH,Gestionnaire paie,17.6,4290,4.7,11,3.4,2.9,9,2.7
+EMP-110,Youssef Dridi,Finance,Comptable,5.7,3940,6.7,1,3.4,2.0,20,3.9
+EMP-111,Mohamed Ayadi,Ventes,Commercial,2.8,3050,6.1,5,4.1,1.9,7,3.0
+EMP-112,Yasmine Bouzid,Finance,Contrôleur de gestion,2.3,3500,2.5,3,3.1,3.1,22,1.8
+EMP-113,Rania Haddad,Production,Technicien,1.4,2520,4.7,11,3.2,2.5,21,1.7
+EMP-114,Rania Mejri,RH,Gestionnaire paie,1.9,2850,5.0,12,4.6,1.7,19,4.4
+EMP-115,Hela Ben Ali,IT,Support technique,4.6,4630,6.0,7,4.3,1.4,6,4.6
+EMP-116,Sami Ben Ali,RH,Chargé de recrutement,0.8,2900,5.7,5,3.8,3.5,10,3.2
+EMP-117,Sarra Dridi,Ventes,Responsable ventes,2.4,3100,5.2,7,4.2,3.3,14,4.2
+EMP-118,Ons Gharbi,Production,Opérateur,2.1,2630,1.8,10,2.7,5.0,31,2.1
+EMP-119,Yasmine Jebali,Marketing,Responsable marketing,12.6,4180,2.9,15,3.2,2.3,23,2.0
+EMP-120,Hela Haddad,Finance,Comptable,8.3,4140,7.3,5,5.0,2.0,10,3.9
+EMP-121,Amel Khelifi,IT,Développeur,1.9,4110,1.6,7,2.6,3.1,36,2.9
+EMP-122,Walid Karray,Finance,Contrôleur de gestion,9.8,4270,2.9,14,2.9,3.4,30,2.0
+EMP-123,Rami Gharbi,Ventes,Responsable ventes,6.6,2990,4.2,20,2.0,3.7,25,2.2
+EMP-124,Fatma Trabelsi,RH,Gestionnaire paie,2.9,3510,5.7,7,3.8,3.0,15,3.1
+EMP-125,Yasmine Ben Ali,Marketing,Chargé marketing,3.3,3610,8.2,3,4.0,1.5,2,3.4
+EMP-126,Nour Haddad,Marketing,Community manager,0.4,2950,1.0,23,1.8,4.3,31,2.9
+EMP-127,Ines Zouari,Marketing,Responsable marketing,1.5,3110,2.6,15,3.6,3.7,24,3.4
+EMP-128,Youssef Haddad,Marketing,Responsable marketing,4.2,3140,7.1,9,4.5,3.5,13,5.0
+EMP-129,Emna Sassi,Marketing,Community manager,1.2,3010,4.0,13,2.9,1.7,15,3.0
+EMP-130,Amel Bouazizi,Marketing,Chargé marketing,0.3,3400,7.3,7,4.6,3.2,14,2.9
+EMP-131,Hichem Karray,Production,Technicien,1.2,2060,5.3,16,1.9,4.2,30,2.2
+EMP-132,Slim Karray,IT,Développeur,0.8,3670,3.3,18,2.8,3.4,34,1.6
+EMP-133,Youssef Mansouri,Finance,Contrôleur de gestion,5.9,4040,8.8,5,4.4,1.1,0,4.2
+EMP-134,Mariem Chaabane,IT,Administrateur systèmes,5.6,4070,6.5,8,4.1,3.0,13,3.9
+EMP-135,Walid Trabelsi,Marketing,Community manager,0.4,3130,5.8,8,2.9,3.1,14,3.4
+EMP-136,Emna Chaabane,IT,Support technique,0.3,3760,5.7,6,3.1,2.4,18,2.5
+EMP-137,Sarra Haddad,Production,Chef d'équipe,1.5,2180,7.2,7,3.7,2.5,2,3.0
+EMP-138,Sarra Mejri,Finance,Comptable,10.2,4020,3.6,17,1.6,4.9,17,1.9
+EMP-139,Ines Trabelsi,Marketing,Responsable marketing,2.4,2900,5.8,10,4.4,2.3,17,3.9
+EMP-140,Meriem Trabelsi,Ventes,Commercial,5.1,3300,5.9,5,3.0,1.2,3,4.1
+EMP-141,Ahmed Khelifi,Finance,Analyste financier,1.1,3730,5.6,12,2.0,2.6,23,1.0
+EMP-142,Amine Belhaj,Production,Opérateur,17.0,2910,2.0,9,1.4,4.6,34,1.0
+EMP-143,Ons Chaabane,Production,Opérateur,8.3,3040,6.8,3,4.4,1.5,14,3.1
+EMP-144,Mohamed Dridi,Ventes,Assistant commercial,1.1,2410,8.4,9,4.5,2.8,9,2.9
+EMP-145,Oussama Ayadi,Marketing,Community manager,0.7,2990,9.3,2,3.9,3.6,0,2.5
+EMP-146,Meriem Chaabane,Ventes,Responsable ventes,0.6,2680,8.1,1,5.0,2.3,5,5.0
+EMP-147,Ons Zouari,Ventes,Responsable ventes,2.7,2640,10.2,0,5.0,1.1,0,4.9
+EMP-148,Sarra Bouzid,IT,Administrateur systèmes,1.2,4490,4.5,8,3.5,2.5,20,4.0
+EMP-149,Youssef Hamdi,Finance,Contrôleur de gestion,1.9,3500,4.5,10,1.9,3.1,18,2.9
+EMP-150,Rim Zouari,Ventes,Commercial,4.1,2860,6.2,1,4.3,1.6,7,3.6
