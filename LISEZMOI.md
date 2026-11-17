@@ -27,3 +27,6 @@ Nouvelle page d'accueil (aperçu en direct, problématique, pondérations), page
 
 ## v4
 Graphiques enrichis : infobulles personnalisées, seuils de risque, étiquettes, aires dégradées, histogramme des scores, nuage satisfaction/absentéisme, carte de chaleur département × ancienneté, jauge en demi-cercle dans le profil.
+
+## v5 — Détails des calculs (pédagogique)
+Dans la page **Méthodologie** : un encadré « Exemple pédagogique : le calcul, pas à pas » montre les 4 étapes (normalisation, mesure du risque q, pondération, somme + seuils) puis un tableau de calcul complet pour le salarié au score le plus élevé, avec les valeurs réelles et les formules calculées (vérifiable à la main). Fonctionne même sans fichier chargé (calculé en direct sur le Demo Dataset) et s'adapte automatiquement aux poids et seuils modifiés. Le même tableau « 🧮 Détail du calcul, pas à pas » est affiché dans chaque profil individuel.

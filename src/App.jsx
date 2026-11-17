@@ -1,10 +1,10 @@
 import {useState,useMemo,useEffect} from 'react'
 import * as XLSX from 'xlsx'
 import {VARS,THRESH,compute,demo} from './scoring.js'
-import {Home,Import,Dashboard,List,Profile,Method,Compare,Actions} from './Pages.jsx'
+import {Home,Import,Dashboard,List,Profile,Method,Compare,Actions,Segments} from './Pages.jsx'
 
-const NAV=[['home','Accueil'],['import','Importation'],['dashboard','Dashboard'],['list','Salariés'],['profile','Profil'],['compare','Comparaison'],['actions',"Plan d'action"],['method','Méthodologie']]
-const PAGES={home:Home,import:Import,dashboard:Dashboard,list:List,profile:Profile,compare:Compare,actions:Actions,method:Method}
+const NAV=[['home','Accueil'],['import','Importation'],['dashboard','Dashboard'],['list','Salariés'],['profile','Profil'],['compare','Comparaison'],['segments','Segmentation'],['actions',"Plan d'action"],['method','Méthodologie']]
+const PAGES={home:Home,import:Import,dashboard:Dashboard,list:List,profile:Profile,compare:Compare,segments:Segments,actions:Actions,method:Method}
 const W0=()=>Object.fromEntries(Object.entries(VARS).map(([k,v])=>[k,v.w]))
 
 export default function App(){

@@ -22,6 +22,21 @@ function exportCsv(rows){const H=['Employee_ID','Département','Poste','Score','
   const L=rows.map(e=>[e.id,e.dept,e.job,e.score,e.lvl,e.fac.map(x=>VARS[x.k].f).join(' | ')].map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(';'))
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+[H.join(';'),...L].join('\n')],{type:'text/csv'}));a.download='resultats_risque_turnover.csv';a.click()}
 const Empty=({go,loadDemo})=><C t="Aucune donnée chargée" s="Importez une base RH ou chargez le jeu de démonstration."><button className="btn" onClick={()=>go('import')}>Importer une base RH</button><button className="btn s" onClick={loadDemo}>Charger le Demo Dataset</button></C>
+/* ===== Détails des calculs (v5) ===== */
+const TENR=[['moins de 1 an',1],['de 1 à 3 ans',.7],['de 3 à 5 ans',.4],['de 5 à 10 ans',.2],['de 10 à 20 ans',.25],['20 ans ou plus',.4]]
+const d3=x=>String(Math.round(x*1000)/1000).replace('.',',')
+const CalcTable=({e})=>{const sw=e.all.reduce((s,x)=>s+x.w,0),sum=e.all.reduce((s,x)=>s+x.pts,0)
+  return <div className="wrap"><table><thead><tr><th>Variable</th><th>Valeur brute v</th><th>Min fichier</th><th>Max fichier</th><th>Normalisation n</th><th>Risque q</th><th>Poids w</th><th>Points = w×q÷Σw×100</th></tr></thead><tbody>
+  {e.all.map(x=>{const V=VARS[x.k],ten=V.dir==='tenure',n=ten?null:(x.v-x.a)/((x.b-x.a)||1)
+    return <tr key={x.k}><td><b>{V.l}</b></td><td>{x.v}</td>
+      {ten?<td colSpan={2} style={{textAlign:'center'}}>—</td>:<><td>{x.a}</td><td>{x.b}</td></>}
+      <td className="frm">{ten?'—':`(${d3(x.v)} − ${d3(x.a)}) ÷ (${d3(x.b)} − ${d3(x.a)}) = ${d3(n)}`}</td>
+      <td className="frm">{ten?`tenRisk(${d3(x.v)}) = ${d3(x.q)}`:`${d3(V.dir==='low'?1-n:n)} ${V.dir==='low'?'(1 − n)':'(= n)'}`}</td>
+      <td>{x.w}</td><td className="frm">{`${x.w} × ${d3(x.q)} ÷ ${sw} × 100 = ${d3(x.pts)}`}</td></tr>})}
+  <tr><td colSpan={6}><b>Somme des poids Σw</b></td><td colSpan={2}><b>{sw}</b>{sw!==100&&<small className="sub"> (total ramené automatiquement à 100)</small>}</td></tr>
+  <tr><td colSpan={6}><b>Somme des points</b></td><td colSpan={2}><b>{d3(sum)}</b></td></tr>
+  <tr><td colSpan={6}><b>Score final = arrondi de la somme</b></td><td colSpan={2}><b style={{color:HEX[e.lvl]}}>{e.score} / 100</b> <Tag l={e.lvl}/></td></tr>
+  </tbody></table></div>}
 const Mini=({t,data,T})=><C t={t} s="Score moyen par groupe (bas / moyen / haut)"><Chart h={190}><BarChart data={data}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name"/><YAxis domain={[0,100]}/><Tooltip content={<Tip/>} cursor={{fill:"rgba(91,79,240,.08)"}}/><ReferenceLine y={T[1]} stroke="#dc2626" strokeDasharray="4 4"/><Bar dataKey="score" name="Score moyen" radius={[6,6,0,0]}>{data.map((x,i)=><Cell key={i} fill={HEX[lvlOf(x.score,T)]}/>)}<LabelList dataKey="score" position="top" fontSize={12}/></Bar></BarChart></Chart></C>
 const Chain=()=><p>{['Données RH','Analyse','Score','Niveau de risque','Facteurs','Action RH'].map(s=><span className="step" key={s}>{s}</span>)}</p>
 const NOTE="Le score constitue un indicateur d'aide à la décision RH et ne permet pas de prédire avec certitude le départ d'un salarié."
@@ -133,11 +148,16 @@ export function Profile({d,src,T,go,sel,loadDemo,open,anon}){
     <C t="Contribution de chaque variable" s="Points de risque"><Chart h={250}><BarChart layout="vertical" data={sorted.map(x=>({name:VARS[x.k].l,Points:+x.pts.toFixed(1)}))}><CartesianGrid strokeDasharray="3 3" horizontal={false}/><XAxis type="number"/><YAxis type="category" dataKey="name" width={130}/><Tooltip content={<Tip/>} cursor={{fill:"rgba(91,79,240,.08)"}}/><Bar dataKey="Points" radius={[0,6,6,0]}>{sorted.map((x,i)=><Cell key={i} fill={x.q>=.75?HEX['Élevé']:x.q>=.5?HEX.Moyen:HEX.Faible}/>)}</Bar></BarChart></Chart></C>
     <C t="Principaux facteurs identifiés">{e.fac.length?e.fac.map((x,i)=><p key={x.k}><b>{i+1}. {VARS[x.k].f}</b><br/><span className="sub">Valeur : {x.v} · Niveau : {x.q>=.75?'fort':'modéré'} · Contribution : +{x.pts.toFixed(1)} pts</span></p>):<p>Aucun facteur de risque marqué dans les données.</p>}</C>
   </div>
+  <C t="🧮 Détail du calcul, pas à pas" s="Valeur brute → normalisation n → risque q → points → score (le même exemple est présenté dans la page Méthodologie)">{e.all.length?<CalcTable e={e}/>:<p>Aucune variable exploitable dans les données.</p>}</C>
   <div className="grid g2"><C t="Pistes d'action RH">{e.fac.length?<ul>{e.fac.map(x=><li key={x.k}>{VARS[x.k].r}</li>)}</ul>:<p>Maintenir le suivi habituel.</p>}<p className="note">Pistes à discuter avec le salarié et son manager, pas des décisions automatiques.</p></C>
   <C cls="sim noprint" t="Simulateur d'actions RH" s="Cochez une action : on suppose que le facteur diminue de moitié (hypothèse pédagogique).">{e.fac.length?e.fac.map(x=><label key={x.k}><input type="checkbox" checked={!!act[e.id+x.k]} onChange={()=>setAct({...act,[e.id+x.k]:!act[e.id+x.k]})}/>{VARS[x.k].r}</label>):<p>Aucun facteur à traiter.</p>}
     <p>Score estimé : <b style={{fontSize:22,color:HEX[lvlOf(ns,T)]}}>{ns}</b> / 100 <Tag l={lvlOf(ns,T)}/> <span className="sub">({ns-e.score} pts)</span></p></C></div></>}
 
-export function Method({W,setW,T,setT}){const tot=Object.values(W).reduce((a,b)=>a+b,0);return <>
+export function Method({W,setW,T,setT,src,d,loadDemo,go}){
+  const tot=Object.values(W).reduce((a,b)=>a+b,0)
+  const ex=useMemo(()=>{if(src)return d;const r=demo();return compute(r,Object.keys(r[0]),W,T)},[src,d,W,T])
+  const e0=[...ex].sort((a,b)=>b.score-a.score)[0]
+  return <>
   <h1>Méthodologie</h1><p className="sub">Données RH → Analyse → Score → Niveau de risque → Facteurs → Action RH</p>
   <C t="Étapes">{['Importation','Nettoyage et vérification','Analyse des variables','Calcul du score','Classification','Facteurs principaux','Recommandations RH'].map((s,i)=><span className="step" key={s}>{i+1}. {s}</span>)}</C>
   <C t="Pondérations (modifiables, recalcul automatique)"><div className="wrap"><table><thead><tr><th>Variable</th><th>Poids</th><th>Règle de risque</th></tr></thead><tbody>
@@ -145,6 +165,17 @@ export function Method({W,setW,T,setT}){const tot=Object.values(W).reduce((a,b)=
       <td>{v.dir==='low'?'Valeur basse → risque élevé':v.dir==='high'?'Valeur haute → risque élevé':'< 1 an : fort · 1–3 : élevé · 3–5 : moyen · 5–10 : faible · 20+ ans : modéré'}</td></tr>)}</tbody></table></div>
     <p>Total : <b>{tot}</b> {tot!==100&&<span className="err">(ramené automatiquement à 100)</span>}</p>
     <p>Seuils : faible &lt; <input type="number" style={{width:70}} value={T[0]} onChange={x=>setT([+x.target.value,T[1]])}/> ≤ moyen &lt; <input type="number" style={{width:70}} value={T[1]} onChange={x=>setT([T[0],+x.target.value])}/> ≤ élevé</p></C>
+  <C t="🧮 Exemple pédagogique : le calcul, pas à pas" s={src?'Exemple concret sur votre base chargée, avec le salarié au score le plus élevé':'Exemple calculé en direct sur le Demo Dataset (fictif) — importez votre fichier pour reproduire le calcul sur vos données'}>
+    <ul className="ins">
+      <li><b>1. Normaliser</b> : chaque valeur est ramenée entre 0 et 1 avec le min et le max du fichier → <span className="frm">n = (valeur − min) ÷ (max − min)</span></li>
+      <li><b>2. Mesurer le risque</b> : <span className="frm">q = n</span> si la valeur haute est risquée, <span className="frm">q = 1 − n</span> si la valeur basse est risquée ; l'ancienneté suit des règles par tranches</li>
+      <li><b>3. Pondérer</b> : <span className="frm">points = poids × q ÷ Σw × 100</span> (les poids ci-dessus, total ramené à 100)</li>
+      <li><b>4. Additionner</b> : la somme des points donne le score /100, puis les seuils ({T[0]} / {T[1]}) déterminent le niveau</li></ul>
+    {e0&&<><p>Exemple concret — <b>{e0.id}</b>, score le plus élevé de la base ({e0.score}/100, risque {e0.lvl}) :</p>
+    {e0.all.length?<CalcTable e={e0}/>:<p>Aucune variable exploitable.</p>}
+    <p className="frm">Score {e0.score} {e0.score<T[0]?'< '+T[0]:e0.score<T[1]?'< '+T[1]:'≥ '+T[1]} → niveau {e0.lvl.toUpperCase()}</p>
+    <p className="note">Chaque ligne se vérifie à la main à partir du fichier. Le calcul est identique pour tous les salariés.</p></>}
+    {!src&&<button className="btn s" onClick={loadDemo}>Charger le Demo Dataset</button>}</C>
   <C t="Calcul et limites"><ul className="ins"><li>Chaque valeur est normalisée entre le min et le max du fichier (0 = risque nul, 1 = risque maximal), puis multipliée par son poids.</li>
     <li>Une variable absente est ignorée et les poids restants sont ramenés à 100 : aucune donnée n'est inventée.</li>
     <li>Le score est un <b>indicateur de risque</b>, pas une probabilité statistique. Il ne repose pas sur un modèle entraîné sur des départs réels.</li>
@@ -176,3 +207,54 @@ export function Actions({d,src,go,loadDemo,open,anon}){
   <C t="Exposition financière potentielle (hypothèse)" s="Estimation indicative, pas une prévision de départs">{withSal.length?<><p>Hypothèse de coût de remplacement : <input type="number" min="0" max="300" style={{width:80}} value={pct} onChange={e=>setPct(Math.max(0,+e.target.value||0))}/> % du salaire annuel (valeur modifiable, à justifier avec des données de l'entreprise).</p>
     <div className="grid k4"><div className="kpi"><small>Salariés à risque élevé</small><b>{hi.length}</b></div><div className="kpi"><small>Masse salariale annuelle</small><b>{Math.round(withSal.reduce((s,e)=>s+e.sal*12,0)).toLocaleString('fr-FR')}</b></div><div className="kpi" style={{'--c':'#dc2626'}}><small>Coût potentiel si tous partaient</small><b>{cost.toLocaleString('fr-FR')}</b></div></div>
     <p className="note">Hypothèses : colonne Salary lue comme salaire mensuel brut ; tous les salariés à risque élevé sont supposés partir, ce qui est un cas extrême.</p></>:<p>Ajoutez une colonne <b>Salary</b> à votre base pour activer cette analyse.</p>}</C></>}
+
+export function Segments({d,src,go,loadDemo,open,anon}){
+  if(!src)return <Empty {...{go,loadDemo}}/>
+  const segs=[]
+  d.forEach(e=>{
+    const fk=e.fac.slice(0,2).map(x=>x.k).sort().join('+')
+    if(!segs.find(s=>s.key===fk)){
+      segs.push({key:fk,ks:e.fac.slice(0,2).map(x=>x.k),items:[],reco:[]})
+    }
+    segs.find(s=>s.key===fk).items.push(e)
+  })
+  segs.forEach(s=>{
+    s.avg=avg(s.items);s.cnt=s.items.length;s.hi=s.items.filter(x=>x.lvl==='Élevé').length
+    s.depts=[...new Set(s.items.map(x=>x.dept))]
+    const u={}
+    s.items.forEach(e=>e.fac.forEach(f=>u[f.k]=(u[f.k]||0)+1))
+    s.top=Object.entries(u).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k)
+    if(s.ks.includes('wl')&&s.ks.includes('abs')){s.name='Risque de burnout';s.desc="Charge élevée et absentéisme — risque lié à la surcharge de travail";s.col='#dc2626';s.reco=["Alléger la charge / équilibrer le portefeuille","Faire un point charge + ressources","Favoriser les temps de récupération","Envisager un aménagement temporaire"]}
+    else if(s.ks.includes('cp')&&s.ks.includes('se')){s.name="Stagnation de carrière";s.desc="Peu d'évolution salariale/carrière avec potentiel à partir";s.col='#f59e0b';s.reco=["Discuter du parcours et des aspirations","Identifier un projet mobilité/formation","Fixer un plan d'évolution clair","Suivi à mi-parcours"]}
+    else if(s.ks.includes('sat')&&s.ks.includes('wl')){s.name='Désengagement lié à la charge';s.desc="Satisfaction en baisse associée à la charge de travail";s.col='#f97316';s.reco=["Écoute active + priorisation","Clarifier priorités / déléguer","Donner de la reconnaissance","Réévaluer les objectifs"]}
+    else if(s.ks.includes('ten')){s.name='Risque lié à l\'ancienneté';s.desc="Moment charnière (début ou fin de cycle)";s.col='#a855f7';s.reco=["Soigner intégration ou perspectives à long terme","Valoriser l'expérience","Discuter souhaits à 2–3 ans","Maintenir la motivation"]}
+    else if(s.ks.includes('ot')){s.name='Équilibre vie pro/perso sous tension';s.desc="Heures supplémentaires importantes";s.col='#06b6d4';s.reco=["Maîtriser le recours aux heures sup.","Favoriser organisation / délégation","Respect des temps de repos","Suivi régulier"]}
+    else{s.name='Profil mixte';s.desc=s.top.map(k=>VARS[k].f).join(' · ');s.col='#5b4ff0';s.reco=[VARS[s.top[0]]?.r||"Entretien individuel ciblé",VARS[s.top[1]]?.r||"Accompagner et clarifier les priorités",VARS[s.top[2]]?.r||"Suivi régulier avec points de vigilance"]}
+  })
+  segs.sort((a,b)=>b.avg-a.avg)
+  const cnt=[...new Set(segs.map(s=>s.name))].length
+  return <><h1>Segmentation des salariés</h1><p className="sub">Regroupement automatique par combinaisons de facteurs principaux · recommandations ciblées par segment</p>
+  <div className="grid k4" style={{marginBottom:16}}>
+    <div className="kpi"><small>Segments identifiés</small><b>{segs.length}</b></div>
+    <div className="kpi"><small>Types de profils</small><b>{cnt}</b></div>
+    <div className="kpi"><small>Salariés segmentés</small><b>{d.length}</b></div>
+    <div className="kpi" style={{'--c':HEX['Élevé']}}><small>Risque élevé dans segments</small><b>{segs.reduce((s,x)=>s+x.hi,0)}</b></div>
+  </div>
+  <C t="Vue d'ensemble par segment" s="Triés par score moyen décroissant">
+    <div className="wrap"><table><thead><tr><th>Segment</th><th>Effectif</th><th>Score moyen</th><th>Risque élevé</th><th>Départements</th><th>Facteurs clés</th><th></th></tr></thead><tbody>
+      {segs.map(s=><tr key={s.key}><td><span style={{display:'inline-block',width:10,height:10,borderRadius:5,background:s.col,marginRight:8}}></span><b>{s.name}</b><br/><small className="sub">{s.desc}</small></td><td><b>{s.cnt}</b></td><td><b>{Math.round(s.avg)}</b> / 100</td><td>{s.hi} ({s.cnt?Math.round(s.hi/s.cnt*100):0}%)</td><td>{s.depts.slice(0,2).join(', ')}{s.depts.length>2?` +${s.depts.length-2}`:''}</td><td>{s.top.map(k=>VARS[k].f).join(' • ')}</td><td className="noprint"></td></tr>)}
+    </tbody></table></div>
+  </C>
+  <h2 className="sect-h">Détails par segment et plan d'action</h2>
+  <div className="grid g2">
+    {segs.map(s=><C key={s.key} t={s.name} s={`${s.cnt} salarié(s) · Score moyen ${Math.round(s.avg)}/100 · ${s.hi} en risque élevé`}>
+      <p className="sub" style={{marginTop:-4}}>{s.desc}</p>
+      <p><b>Recommandations RH ciblées :</b></p>
+      <ul>{s.reco.map((r,i)=><li key={i}>{r}</li>)}</ul>
+      <p><b>Salariés dans ce segment :</b></p>
+      <div className="wrap" style={{maxHeight:260,overflow:'auto'}}><table><thead><tr><th>Salarié</th><th>Dépt.</th><th>Score</th><th>Niveau</th><th>Facteurs</th><th></th></tr></thead><tbody>
+        {s.items.sort((a,b)=>b.score-a.score).map(e=><tr key={e.id}><td><Who e={e} anon={anon}/></td><td>{e.dept}</td><td><b>{e.score}</b></td><td><Tag l={e.lvl}/></td><td style={{fontSize:12}}>{e.fac.slice(0,2).map(x=>VARS[x.k].f.split(' ')[0]).join(', ')}</td><td><button className="btn sm" onClick={()=>open(e.id)}>Profil</button></td></tr>)}
+      </tbody></table></div>
+    </C>)}
+  </div>
+</>}

@@ -24,7 +24,7 @@ export function compute(rows,cols,W,T){const m=mapCols(cols),st={};
  return rows.map((r,i)=>{const f=[];let sw=0,sp=0;
   for(const k in st){const v=num(r[m[k]]);if(v===null)continue;const[a,b]=st[k];let q;
    if(VARS[k].dir==='tenure')q=tenRisk(v);else{const n=(v-a)/((b-a)||1);q=VARS[k].dir==='low'?1-n:n}
-   sw+=W[k];f.push({k,v,q,w:W[k]})}
+   sw+=W[k];f.push({k,v,q,w:W[k],a,b})}
   f.forEach(x=>{x.pts=sw?x.w*x.q/sw*100:0;sp+=x.pts});
   const score=Math.round(sp);
   return{id:m.id?r[m.id]:'E'+(i+1),name:m.name?r[m.name]:null,sal:m.salary?num(r[m.salary]):null,dept:m.dept?r[m.dept]:'—',job:m.job?r[m.job]:'—',ten:m.ten?num(r[m.ten]):null,sat:m.sat?num(r[m.sat]):null,abs:m.abs?num(r[m.abs]):null,wl:m.wl?num(r[m.wl]):null,raw:r,score,lvl:lvlOf(score,T),
