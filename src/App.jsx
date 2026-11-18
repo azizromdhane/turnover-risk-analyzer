@@ -1,16 +1,17 @@
 import {useState,useMemo,useEffect} from 'react'
 import * as XLSX from 'xlsx'
-import {VARS,THRESH,compute,demo} from './scoring.js'
+import {VARS,THRESH,GRID,compute,demo} from './scoring.js'
 import {Home,Import,Dashboard,List,Profile,Method,Compare,Actions,Segments} from './Pages.jsx'
 
 const NAV=[['home','Accueil'],['import','Importation'],['dashboard','Dashboard'],['list','Salariés'],['profile','Profil'],['compare','Comparaison'],['segments','Segmentation'],['actions',"Plan d'action"],['method','Méthodologie']]
 const PAGES={home:Home,import:Import,dashboard:Dashboard,list:List,profile:Profile,compare:Compare,segments:Segments,actions:Actions,method:Method}
 const W0=()=>Object.fromEntries(Object.entries(VARS).map(([k,v])=>[k,v.w]))
+const G0=()=>Object.fromEntries(Object.entries(GRID).map(([k,v])=>[k,{...v,rows:v.rows.map(r=>({...r}))}]))
 
 export default function App(){
-  const[page,go]=useState('home'),[src,setSrc]=useState(null),[W,setW]=useState(W0),[T,setT]=useState(THRESH),[sel,setSel]=useState(null),[err,setErr]=useState(''),[anon,setAnon]=useState(false),[dark,setDark]=useState(false)
+  const[page,go]=useState('home'),[src,setSrc]=useState(null),[W,setW]=useState(W0),[T,setT]=useState(THRESH),[G,setG]=useState(G0),[sel,setSel]=useState(null),[err,setErr]=useState(''),[anon,setAnon]=useState(false),[dark,setDark]=useState(false)
   useEffect(()=>{document.documentElement.dataset.theme=dark?'dark':'light'},[dark])
-  const d=useMemo(()=>src?compute(src.rows,src.cols,W,T):[],[src,W,T])
+  const d=useMemo(()=>src?compute(src.rows,src.cols,W,T,G):[],[src,W,T,G])
   const load=(rows,name,isDemo)=>{if(!rows.length){setErr('Fichier vide.');return}setErr('');setSrc({rows,cols:Object.keys(rows[0]),name,isDemo})}
   const loadDemo=()=>{load(demo(),'Demo Dataset',true);go('dashboard')}
   const onFile=ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader()
@@ -25,7 +26,7 @@ export default function App(){
       {src?.isDemo&&<span className="badge">Demo Dataset (fictif)</span>}
       <button className="ic" title="Masquer les noms (anonymisation)" onClick={()=>setAnon(!anon)}>{anon?'🔒 Mode anonyme':'👁 Noms visibles'}</button><button className="ic" onClick={()=>setDark(!dark)}>{dark?'☀️':'🌙'}</button>
       <input className="srch" placeholder="Rechercher un salarié (ID ou nom) + Entrée" onKeyDown={search}/></header>
-    <main className="main" key={page}><Page {...{anon,d,src,T,W,setW,setT,go,open,sel,load,loadDemo,onFile,err}}/></main>
+    <main className="main" key={page}><Page {...{anon,d,src,T,W,setW,setT,G,setG,go,open,sel,load,loadDemo,onFile,err}}/></main>
     <footer className="foot noprint">Turnover Risk Analyzer · Projet universitaire Management des Affaires / RH · Le score est un indicateur d'aide à la décision, pas une prédiction. Mode démo : données fictives.</footer>
   </>
 }

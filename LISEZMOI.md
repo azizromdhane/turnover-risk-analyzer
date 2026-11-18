@@ -8,11 +8,11 @@ Installer Node.js (version LTS) depuis https://nodejs.org, une seule fois.
 4. Page Importation > choisissez `donnees-test/base_rh_avec_noms.xlsx`.
 
 ## Où modifier quoi
-- Variables, poids, règles, recommandations : `src/scoring.js` (bloc `VARS`)
-- Seuils par défaut : `src/scoring.js` (`THRESH`) ; modifiables aussi dans la page Méthodologie
-- Règle de l'ancienneté : `src/scoring.js` (`tenRisk`)
+- Variables, poids, recommandations : `src/scoring.js` (bloc `VARS`)
+- Grilles de risque par facteur (tranches et scores 0–100) : `src/scoring.js` (bloc `GRID`) ; modifiables aussi dans la page Méthodologie
+- Seuils du score final (faible / moyen / élevé) : `src/scoring.js` (`THRESH`) ; modifiables aussi dans la page Méthodologie
 - Navigation et état : `src/App.jsx` ; pages et graphiques (Recharts) : `src/Pages.jsx` ; couleurs et style : `src/index.css`
-- Ajouter une variable : ajouter une ligne dans `VARS` (libellé, poids, noms de colonnes, sens, facteur, reco)
+- Ajouter une variable : ajouter une ligne dans `VARS` et une grille dans `GRID` (libellé, poids, noms de colonnes, facteur, reco)
 - Version finale : `npm run build` puis `npm run preview`
 
 ## Nouveautés v2
@@ -28,5 +28,5 @@ Nouvelle page d'accueil (aperçu en direct, problématique, pondérations), page
 ## v4
 Graphiques enrichis : infobulles personnalisées, seuils de risque, étiquettes, aires dégradées, histogramme des scores, nuage satisfaction/absentéisme, carte de chaleur département × ancienneté, jauge en demi-cercle dans le profil.
 
-## v5 — Détails des calculs (pédagogique)
-Dans la page **Méthodologie** : un encadré « Exemple pédagogique : le calcul, pas à pas » montre les 4 étapes (normalisation, mesure du risque q, pondération, somme + seuils) puis un tableau de calcul complet pour le salarié au score le plus élevé, avec les valeurs réelles et les formules calculées (vérifiable à la main). Fonctionne même sans fichier chargé (calculé en direct sur le Demo Dataset) et s'adapte automatiquement aux poids et seuils modifiés. Le même tableau « 🧮 Détail du calcul, pas à pas » est affiché dans chaque profil individuel.
+## v5 — Scoring simple par grilles de risque (pédagogique)
+La page **Méthodologie** présente une méthode simple en 3 étapes : lire la valeur, donner un score de risque de 0 à 100 grâce à la grille du facteur, puis multiplier par le poids et additionner. Le tableau central montre pour chaque facteur ce qu'il mesure, sa conversion en risque et son poids. Un exemple complet pour **Ines Haddad** (EMP-011) détaille le calcul, vérifiable à la main. Les poids, seuils et grilles restent personnalisables (option masquée). Le même tableau « 🧮 Détail du calcul, pas à pas » est affiché dans chaque profil individuel.

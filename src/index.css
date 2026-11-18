@@ -56,3 +56,5 @@ th{position:sticky;top:0;background:var(--cd)}h2.sec{margin:26px 0 12px;font-siz
 html,body,#root{width:100%;min-height:100vh;margin:0}.top,.foot{width:100%}
 @media(min-width:1500px){body{font-size:16px}h1{font-size:30px}.kpi b{font-size:34px}}
 @media(min-width:1900px){body{font-size:17px}}
+
+.grids{display:grid;gap:10px}.gridcard{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:12px 14px}.gridcard[open]{background:var(--cd);box-shadow:0 1px 3px rgba(20,30,60,.05)}.gridcard summary{cursor:pointer;font-size:15px;padding:2px 0}.gridcard summary::marker{color:var(--ac)}.gridjust{background:rgba(91,79,240,.08);border-left:3px solid var(--ac);padding:8px 12px;border-radius:8px;font-size:13px;margin:10px 0}.gridcard table{margin-top:4px}

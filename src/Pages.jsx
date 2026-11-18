@@ -1,6 +1,6 @@
 import {useState,useMemo} from 'react'
 import {PieChart,Pie,Cell,BarChart,Bar,XAxis,YAxis,Tooltip,Legend,ResponsiveContainer,LineChart,Line,ComposedChart,Area,ReferenceLine,LabelList,ScatterChart,Scatter,CartesianGrid,RadarChart,Radar,PolarGrid,PolarAngleAxis,PolarRadiusAxis} from 'recharts'
-import {VARS,OPT,THRESH,lvlOf,mapCols,compute,demo} from './scoring.js'
+import {VARS,OPT,GRID,riskLvl,lvlOf,mapCols,compute,demo,INES} from './scoring.js'
 
 export const HEX={Faible:'#16a34a',Moyen:'#f59e0b','Élevé':'#dc2626'}
 const LV=['Faible','Moyen','Élevé'],TB=['< 1 an','1–3 ans','3–5 ans','5–10 ans','10+ ans']
@@ -17,34 +17,30 @@ const Chart=({h=240,children})=><ResponsiveContainer width="100%" height={h}>{ch
 const Bar1=({e})=><div className="bt"><div className="bf" style={{width:e.score+'%',background:HEX[e.lvl]}}/></div>
 const group=(d,fn,order)=>{const g={};d.forEach(e=>{const k=fn(e);if(k!=null)(g[k]=g[k]||[]).push(e)});return(order||Object.keys(g)).filter(k=>g[k]).map(k=>({name:k,score:avg(g[k]),n:g[k].length}))}
 const third=(d,key)=>{const v=d.map(e=>e[key]).filter(x=>x!=null);if(!v.length)return()=>null;const a=Math.min(...v),b=Math.max(...v);return e=>e[key]==null?null:['Bas','Moyen','Haut'][Math.min(2,Math.floor((e[key]-a)/((b-a)||1)*3))]}
-const orgRisk=d=>Object.keys(VARS).map(k=>{const v=d.flatMap(e=>e.all.filter(x=>x.k===k));return{k,v:VARS[k].l,org:v.length?Math.round(v.reduce((s,x)=>s+x.q,0)/v.length*100):null,n:v.filter(x=>x.q>=.5).length}}).filter(x=>x.org!==null)
+const orgRisk=d=>Object.keys(VARS).map(k=>{const v=d.flatMap(e=>e.all.filter(x=>x.k===k));return{k,v:VARS[k].l,org:v.length?Math.round(v.reduce((s,x)=>s+x.q,0)/v.length*100):null,n:v.filter(x=>x.s>=65).length}}).filter(x=>x.org!==null)
 function exportCsv(rows){const H=['Employee_ID','Département','Poste','Score','Niveau','Facteurs principaux']
   const L=rows.map(e=>[e.id,e.dept,e.job,e.score,e.lvl,e.fac.map(x=>VARS[x.k].f).join(' | ')].map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(';'))
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+[H.join(';'),...L].join('\n')],{type:'text/csv'}));a.download='resultats_risque_turnover.csv';a.click()}
 const Empty=({go,loadDemo})=><C t="Aucune donnée chargée" s="Importez une base RH ou chargez le jeu de démonstration."><button className="btn" onClick={()=>go('import')}>Importer une base RH</button><button className="btn s" onClick={loadDemo}>Charger le Demo Dataset</button></C>
-/* ===== Détails des calculs (v5) ===== */
-const TENR=[['moins de 1 an',1],['de 1 à 3 ans',.7],['de 3 à 5 ans',.4],['de 5 à 10 ans',.2],['de 10 à 20 ans',.25],['20 ans ou plus',.4]]
-const d3=x=>String(Math.round(x*1000)/1000).replace('.',',')
+/* ===== Détails des calculs (grilles de risque) ===== */
+const d3=x=>String(Math.round(x*100)/100).replace('.',',')
+const fin=v=>Number.isFinite(v)?d3(v):'∞'
+const tranche=x=>x.lo===-Infinity?`≤ ${fin(x.hi)}`:Number.isFinite(x.hi)?`${fin(x.lo)}–${fin(x.hi)}`:`> ${fin(x.lo)}`
 const CalcTable=({e})=>{const sw=e.all.reduce((s,x)=>s+x.w,0),sum=e.all.reduce((s,x)=>s+x.pts,0)
-  return <div className="wrap"><table><thead><tr><th>Variable</th><th>Valeur brute v</th><th>Min fichier</th><th>Max fichier</th><th>Normalisation n</th><th>Risque q</th><th>Poids w</th><th>Points = w×q÷Σw×100</th></tr></thead><tbody>
-  {e.all.map(x=>{const V=VARS[x.k],ten=V.dir==='tenure',n=ten?null:(x.v-x.a)/((x.b-x.a)||1)
-    return <tr key={x.k}><td><b>{V.l}</b></td><td>{x.v}</td>
-      {ten?<td colSpan={2} style={{textAlign:'center'}}>—</td>:<><td>{x.a}</td><td>{x.b}</td></>}
-      <td className="frm">{ten?'—':`(${d3(x.v)} − ${d3(x.a)}) ÷ (${d3(x.b)} − ${d3(x.a)}) = ${d3(n)}`}</td>
-      <td className="frm">{ten?`tenRisk(${d3(x.v)}) = ${d3(x.q)}`:`${d3(V.dir==='low'?1-n:n)} ${V.dir==='low'?'(1 − n)':'(= n)'}`}</td>
-      <td>{x.w}</td><td className="frm">{`${x.w} × ${d3(x.q)} ÷ ${sw} × 100 = ${d3(x.pts)}`}</td></tr>})}
-  <tr><td colSpan={6}><b>Somme des poids Σw</b></td><td colSpan={2}><b>{sw}</b>{sw!==100&&<small className="sub"> (total ramené automatiquement à 100)</small>}</td></tr>
-  <tr><td colSpan={6}><b>Somme des points</b></td><td colSpan={2}><b>{d3(sum)}</b></td></tr>
-  <tr><td colSpan={6}><b>Score final = arrondi de la somme</b></td><td colSpan={2}><b style={{color:HEX[e.lvl]}}>{e.score} / 100</b> <Tag l={e.lvl}/></td></tr>
+  return <div className="wrap"><table><thead><tr><th>Facteur</th><th>Valeur du salarié</th><th>Tranche</th><th>Score de risque</th><th>Poids</th><th>Points obtenus</th></tr></thead><tbody>
+  {e.all.map(x=>{const V=VARS[x.k]
+    return <tr key={x.k}><td><b>{V.l}</b></td><td>{d3(x.v)} <small className="sub">{GRID[x.k]?.u}</small></td>
+      <td className="frm">{tranche(x)}</td><td><b>{x.s}</b> / 100 <Tag l={x.lvl}/></td><td>{x.w} %</td><td><b>{d3(x.pts)}</b></td></tr>})}
+  <tr><td colSpan={5}><b>Total des points = score final</b>{sw!==100&&<small className="sub"> (poids ramené automatiquement à 100)</small>}</td><td><b style={{color:HEX[e.lvl]}}>{d3(sum)} ≈ {e.score} / 100</b> <Tag l={e.lvl}/></td></tr>
   </tbody></table></div>}
 const Mini=({t,data,T})=><C t={t} s="Score moyen par groupe (bas / moyen / haut)"><Chart h={190}><BarChart data={data}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name"/><YAxis domain={[0,100]}/><Tooltip content={<Tip/>} cursor={{fill:"rgba(91,79,240,.08)"}}/><ReferenceLine y={T[1]} stroke="#dc2626" strokeDasharray="4 4"/><Bar dataKey="score" name="Score moyen" radius={[6,6,0,0]}>{data.map((x,i)=><Cell key={i} fill={HEX[lvlOf(x.score,T)]}/>)}<LabelList dataKey="score" position="top" fontSize={12}/></Bar></BarChart></Chart></C>
 const Chain=()=><p>{['Données RH','Analyse','Score','Niveau de risque','Facteurs','Action RH'].map(s=><span className="step" key={s}>{s}</span>)}</p>
 const NOTE="Le score constitue un indicateur d'aide à la décision RH et ne permet pas de prédire avec certitude le départ d'un salarié."
 
 const PAL=['#4f46e5','#0ea5e9','#14b8a6','#f59e0b','#ef4444','#a855f7','#64748b']
-export function Home({go,loadDemo}){
+export function Home({go,loadDemo,T,W,G}){
   const S=[['📥','Données RH','Import Excel / CSV'],['🔎','Analyse','Vérification et nettoyage'],['🧮','Score','Sur 100 points pondérés'],['🚦','Niveau de risque','Faible, moyen, élevé'],['🧩','Facteurs','Ce qui explique le score'],['🤝','Action RH','Pistes concrètes']]
-  const dd=useMemo(()=>{const r=demo();return compute(r,Object.keys(r[0]),Object.fromEntries(Object.entries(VARS).map(([k,v])=>[k,v.w])),THRESH)},[])
+  const dd=useMemo(()=>{const r=demo();return compute(r,Object.keys(r[0]),W,T,G)},[W,T,G])
   const cn=Object.fromEntries(LV.map(l=>[l,dd.filter(e=>e.lvl===l).length])),dept=[...new Set(dd.map(e=>e.dept))].map(n=>({name:n,score:avg(dd.filter(e=>e.dept===n))}))
   return <>
   <div className="hero2"><div><span className="pill">People Analytics · Management des Affaires / RH</span><h1>Turnover Risk Analyzer</h1>
@@ -60,12 +56,12 @@ export function Home({go,loadDemo}){
   <h2 className="sect-h">Aperçu en direct</h2><p className="sect-s">Calculé maintenant sur le Demo Dataset (60 salariés fictifs)</p>
   <section className="card live"><div className="grid k4" style={{marginBottom:12}}>{[['Salariés',dd.length,'#3730d4'],['Risque élevé',cn['Élevé'],HEX['Élevé']],['Risque moyen',cn.Moyen,HEX.Moyen],['Risque faible',cn.Faible,HEX.Faible]].map(([a,b,c])=><div className="kpi" key={a} style={{'--c':c}}><small>{a}</small><b>{b}</b></div>)}</div>
     <div className="grid g2"><Chart h={220}><PieChart><Pie data={LV.map(l=>({name:l,value:cn[l]}))} dataKey="value" innerRadius={50} outerRadius={85} paddingAngle={3}>{LV.map(l=><Cell key={l} fill={HEX[l]}/>)}</Pie><Tooltip content={<Tip/>} cursor={{fill:"rgba(91,79,240,.08)"}}/><Legend/></PieChart></Chart>
-    <Chart h={220}><BarChart data={dept}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name"/><YAxis domain={[0,100]}/><Tooltip content={<Tip/>} cursor={{fill:"rgba(91,79,240,.08)"}}/><Bar dataKey="score" name="Score moyen" radius={[6,6,0,0]}>{dept.map((x,i)=><Cell key={i} fill={HEX[lvlOf(x.score,THRESH)]}/>)}</Bar></BarChart></Chart></div>
+    <Chart h={220}><BarChart data={dept}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name"/><YAxis domain={[0,100]}/><Tooltip content={<Tip/>} cursor={{fill:"rgba(91,79,240,.08)"}}/><Bar dataKey="score" name="Score moyen" radius={[6,6,0,0]}>{dept.map((x,i)=><Cell key={i} fill={HEX[lvlOf(x.score,T)]}/>)}</Bar></BarChart></Chart></div>
     <p style={{textAlign:'center',marginBottom:0}}><button className="btn" onClick={loadDemo}>Ouvrir le dashboard complet →</button></p></section>
   <h2 className="sect-h">De la donnée à l'action RH</h2><p className="sect-s">Six étapes, entièrement automatiques</p>
   <div className="tl">{S.map(([i,t,s],k)=><div className="card" key={t}><div className="n">{k+1}</div><b>{i} {t}</b><p>{s}</p></div>)}</div>
-  <h2 className="sect-h">Un score transparent</h2><p className="sect-s">Pondérations initiales sur 100 points (modifiables dans la page Méthodologie)</p>
-  <div className="card"><div className="wbar">{Object.values(VARS).map((v,i)=><div key={v.l} style={{flex:v.w,background:PAL[i]}}><b>{v.w}</b>{v.l}</div>)}</div></div>
+  <h2 className="sect-h">Un score transparent</h2><p className="sect-s">Pondérations actuelles sur 100 points (modifiables dans la page Méthodologie)</p>
+  <div className="card"><div className="wbar">{Object.entries(VARS).map(([k,v],i)=><div key={k} style={{flex:W[k],background:PAL[i]}}><b>{W[k]}</b>{v.l}</div>)}</div></div>
   <h2 className="sect-h">Fonctionnalités</h2><p className="sect-s">Tout ce qu'il faut pour démontrer la démarche</p>
   <div className="grid g3">{[['📊','Dashboard décisionnel','8 graphiques interactifs, filtre par département, synthèse automatique.'],['👤','Profil individuel','Score, radar comparé à la moyenne, facteurs et pistes d\'action.'],['🧪','Simulateur d\'actions','Estimez l\'effet d\'une mesure RH sur le score (hypothèse pédagogique).'],['🆚','Comparaison','Comparez deux départements sur tous les facteurs de risque.'],['🗂️','Plan d\'action RH','Priorités par facteur, entretiens à planifier, exposition financière.'],['🔒','Mode anonyme','Masquez les noms en un clic ; export CSV et impression PDF.']].map(([i,t,s])=><C key={t} t={i+' '+t}><p className="sub">{s}</p></C>)}</div>
   <C t="⚖️ Un indicateur, pas une prédiction"><p className="sub">Le score repose sur des règles transparentes et non sur un modèle entraîné sur des départs réels. Les données doivent être anonymisées : l'application ne doit pas afficher de nom, numéro de téléphone, adresse ou autre donnée personnelle inutile à l'analyse.</p></C>
@@ -146,40 +142,97 @@ export function Profile({d,src,T,go,sel,loadDemo,open,anon}){
       <p className="sub">Département {e.dept} : {da}/100 · Organisation : {Math.round(d.reduce((s,x)=>s+x.score,0)/d.length)}/100</p><p className="note">Indicateur de risque, pas une prédiction de départ.</p></C>
     <C t="Salarié vs moyenne de l'organisation" s="Niveau de risque par variable (0–100)"><Chart h={250}><RadarChart data={e.all.map(x=>({v:VARS[x.k].l,Salarié:Math.round(x.q*100),Moyenne:org.find(o=>o.k===x.k)?.org}))}><PolarGrid/><PolarAngleAxis dataKey="v" tick={{fontSize:11}}/><PolarRadiusAxis domain={[0,100]}/><Radar name="Salarié" dataKey="Salarié" stroke={HEX[e.lvl]} fill={HEX[e.lvl]} fillOpacity={.35}/><Radar name="Moyenne" dataKey="Moyenne" stroke="#94a3b8" fill="#94a3b8" fillOpacity={.15}/><Legend/><Tooltip content={<Tip/>} cursor={{fill:"rgba(91,79,240,.08)"}}/></RadarChart></Chart></C>
     <C t="Contribution de chaque variable" s="Points de risque"><Chart h={250}><BarChart layout="vertical" data={sorted.map(x=>({name:VARS[x.k].l,Points:+x.pts.toFixed(1)}))}><CartesianGrid strokeDasharray="3 3" horizontal={false}/><XAxis type="number"/><YAxis type="category" dataKey="name" width={130}/><Tooltip content={<Tip/>} cursor={{fill:"rgba(91,79,240,.08)"}}/><Bar dataKey="Points" radius={[0,6,6,0]}>{sorted.map((x,i)=><Cell key={i} fill={x.q>=.75?HEX['Élevé']:x.q>=.5?HEX.Moyen:HEX.Faible}/>)}</Bar></BarChart></Chart></C>
-    <C t="Principaux facteurs identifiés">{e.fac.length?e.fac.map((x,i)=><p key={x.k}><b>{i+1}. {VARS[x.k].f}</b><br/><span className="sub">Valeur : {x.v} · Niveau : {x.q>=.75?'fort':'modéré'} · Contribution : +{x.pts.toFixed(1)} pts</span></p>):<p>Aucun facteur de risque marqué dans les données.</p>}</C>
+    <C t="Principaux facteurs identifiés">{e.fac.length?e.fac.map((x,i)=><p key={x.k}><b>{i+1}. {VARS[x.k].f}</b><br/><span className="sub">Valeur : {x.v} · Tranche : {tranche(x)} · Score de risque : {x.s}/100 ({x.lvl}) · Contribution : +{x.pts.toFixed(1)} pts</span></p>):<p>Aucun facteur de risque marqué dans les données.</p>}</C>
   </div>
-  <C t="🧮 Détail du calcul, pas à pas" s="Valeur brute → normalisation n → risque q → points → score (le même exemple est présenté dans la page Méthodologie)">{e.all.length?<CalcTable e={e}/>:<p>Aucune variable exploitable dans les données.</p>}</C>
+  <C t="🧮 Détail du calcul, pas à pas" s="Valeur → tranche de la grille → score de risque → contribution → score final (même méthode que la page Méthodologie)">{e.all.length?<CalcTable e={e}/>:<p>Aucune variable exploitable dans les données.</p>}</C>
   <div className="grid g2"><C t="Pistes d'action RH">{e.fac.length?<ul>{e.fac.map(x=><li key={x.k}>{VARS[x.k].r}</li>)}</ul>:<p>Maintenir le suivi habituel.</p>}<p className="note">Pistes à discuter avec le salarié et son manager, pas des décisions automatiques.</p></C>
   <C cls="sim noprint" t="Simulateur d'actions RH" s="Cochez une action : on suppose que le facteur diminue de moitié (hypothèse pédagogique).">{e.fac.length?e.fac.map(x=><label key={x.k}><input type="checkbox" checked={!!act[e.id+x.k]} onChange={()=>setAct({...act,[e.id+x.k]:!act[e.id+x.k]})}/>{VARS[x.k].r}</label>):<p>Aucun facteur à traiter.</p>}
     <p>Score estimé : <b style={{fontSize:22,color:HEX[lvlOf(ns,T)]}}>{ns}</b> / 100 <Tag l={lvlOf(ns,T)}/> <span className="sub">({ns-e.score} pts)</span></p></C></div></>}
 
-export function Method({W,setW,T,setT,src,d,loadDemo,go}){
+const MEASURE={sat:'Note de satisfaction (1 à 5)',ten:"Années passées dans l'entreprise",se:'Augmentation salariale annuelle (%)',abs:"Jours d'absence par an",wl:'Charge de travail ressentie (1 à 5)',ot:'Heures supplémentaires par mois',cp:"Possibilités d'évolution (1 à 5)"}
+const conv=g=>g.rows.map((r,i)=>{const lo=i>0?g.rows[i-1].max:-Infinity,last=i===g.rows.length-1
+  return `${i===0?`≤ ${fin(r.max)}`:last?`> ${fin(lo)}`:`${fin(lo)}–${fin(r.max)}`} : ${r.score}`}).join(' · ')
+export function Method({W,setW,T,setT,G,setG,src,d,loadDemo,go}){
+  const[adv,setAdv]=useState(false)
   const tot=Object.values(W).reduce((a,b)=>a+b,0)
-  const ex=useMemo(()=>{if(src)return d;const r=demo();return compute(r,Object.keys(r[0]),W,T)},[src,d,W,T])
-  const e0=[...ex].sort((a,b)=>b.score-a.score)[0]
+  const ex=useMemo(()=>{if(src)return d;const r=demo();return compute(r,Object.keys(r[0]),W,T,G)},[src,d,W,T,G])
+  const stats=useMemo(()=>Object.fromEntries(Object.entries(VARS).map(([k])=>{
+    const v=ex.flatMap(e=>e.all.filter(x=>x.k===k).map(x=>x.v))
+    return [k,v.length?{min:Math.min(...v),max:Math.max(...v),n:v.length}:null]})),[ex])
+  const ines=useMemo(()=>{
+    const found=src&&d.find(e=>/ines\s+haddad/i.test(String(e.name||'')))
+    return found||compute([INES],Object.keys(INES),W,T,G)[0]
+  },[src,d,W,T,G])
+  const sum=ines.all.reduce((s,x)=>s+x.pts,0)
+  const setMax=(k,i,val)=>{const rows=G[k].rows,lo=i>0?rows[i-1].max:-Infinity,hi=i<rows.length-1?rows[i+1].max:Infinity
+    let v=Math.max(0,+val||0);if(Number.isFinite(lo))v=Math.max(v,lo+0.01);if(Number.isFinite(hi))v=Math.min(v,hi-0.01)
+    setG({...G,[k]:{...G[k],rows:rows.map((r,j)=>j===i?{...r,max:Math.round(v*100)/100}:r)}})}
+  const setScore=(k,i,val)=>setG({...G,[k]:{...G[k],rows:G[k].rows.map((r,j)=>j===i?{...r,score:Math.max(0,Math.min(100,+val||0))}:r)}})
+  const reset=()=>setG(Object.fromEntries(Object.entries(GRID).map(([k,v])=>[k,{...v,rows:v.rows.map(r=>({...r}))}])))
   return <>
-  <h1>Méthodologie</h1><p className="sub">Données RH → Analyse → Score → Niveau de risque → Facteurs → Action RH</p>
-  <C t="Étapes">{['Importation','Nettoyage et vérification','Analyse des variables','Calcul du score','Classification','Facteurs principaux','Recommandations RH'].map((s,i)=><span className="step" key={s}>{i+1}. {s}</span>)}</C>
-  <C t="Pondérations (modifiables, recalcul automatique)"><div className="wrap"><table><thead><tr><th>Variable</th><th>Poids</th><th>Règle de risque</th></tr></thead><tbody>
-    {Object.entries(VARS).map(([k,v])=><tr key={k}><td>{v.l}</td><td><input type="number" min="0" style={{width:80,margin:0}} value={W[k]} onChange={x=>setW({...W,[k]:Math.max(0,+x.target.value||0)})}/></td>
-      <td>{v.dir==='low'?'Valeur basse → risque élevé':v.dir==='high'?'Valeur haute → risque élevé':'< 1 an : fort · 1–3 : élevé · 3–5 : moyen · 5–10 : faible · 20+ ans : modéré'}</td></tr>)}</tbody></table></div>
-    <p>Total : <b>{tot}</b> {tot!==100&&<span className="err">(ramené automatiquement à 100)</span>}</p>
-    <p>Seuils : faible &lt; <input type="number" style={{width:70}} value={T[0]} onChange={x=>setT([+x.target.value,T[1]])}/> ≤ moyen &lt; <input type="number" style={{width:70}} value={T[1]} onChange={x=>setT([T[0],+x.target.value])}/> ≤ élevé</p></C>
-  <C t="🧮 Exemple pédagogique : le calcul, pas à pas" s={src?'Exemple concret sur votre base chargée, avec le salarié au score le plus élevé':'Exemple calculé en direct sur le Demo Dataset (fictif) — importez votre fichier pour reproduire le calcul sur vos données'}>
-    <ul className="ins">
-      <li><b>1. Normaliser</b> : chaque valeur est ramenée entre 0 et 1 avec le min et le max du fichier → <span className="frm">n = (valeur − min) ÷ (max − min)</span></li>
-      <li><b>2. Mesurer le risque</b> : <span className="frm">q = n</span> si la valeur haute est risquée, <span className="frm">q = 1 − n</span> si la valeur basse est risquée ; l'ancienneté suit des règles par tranches</li>
-      <li><b>3. Pondérer</b> : <span className="frm">points = poids × q ÷ Σw × 100</span> (les poids ci-dessus, total ramené à 100)</li>
-      <li><b>4. Additionner</b> : la somme des points donne le score /100, puis les seuils ({T[0]} / {T[1]}) déterminent le niveau</li></ul>
-    {e0&&<><p>Exemple concret — <b>{e0.id}</b>, score le plus élevé de la base ({e0.score}/100, risque {e0.lvl}) :</p>
-    {e0.all.length?<CalcTable e={e0}/>:<p>Aucune variable exploitable.</p>}
-    <p className="frm">Score {e0.score} {e0.score<T[0]?'< '+T[0]:e0.score<T[1]?'< '+T[1]:'≥ '+T[1]} → niveau {e0.lvl.toUpperCase()}</p>
-    <p className="note">Chaque ligne se vérifie à la main à partir du fichier. Le calcul est identique pour tous les salariés.</p></>}
-    {!src&&<button className="btn s" onClick={loadDemo}>Charger le Demo Dataset</button>}</C>
-  <C t="Calcul et limites"><ul className="ins"><li>Chaque valeur est normalisée entre le min et le max du fichier (0 = risque nul, 1 = risque maximal), puis multipliée par son poids.</li>
-    <li>Une variable absente est ignorée et les poids restants sont ramenés à 100 : aucune donnée n'est inventée.</li>
-    <li>Le score est un <b>indicateur de risque</b>, pas une probabilité statistique. Il ne repose pas sur un modèle entraîné sur des départs réels.</li>
-    <li>Les pondérations sont des hypothèses de départ, à valider avec des données historiques de départs.</li><li>{NOTE}</li></ul></C></>}
+  <h1>Méthodologie</h1><p className="sub">Comment calculer simplement le risque de turnover de chaque salarié.</p>
+  <C t="La méthode en 3 étapes" s="Pas de formule compliquée : on lit une valeur, on donne un score de risque, on pondère.">
+    <div className="grid g3">
+      <div className="kpi" style={{'--c':'#3730d4'}}><small>1. Lire la valeur</small><b>0 à 5</b><span>Satisfaction, ancienneté, absentéisme, charge, heures sup., carrière…</span></div>
+      <div className="kpi" style={{'--c':'#f59e0b'}}><small>2. Donner un score de risque</small><b>0 à 100</b><span>La grille du facteur indique le score correspondant à la tranche.</span></div>
+      <div className="kpi" style={{'--c':'#16a34a'}}><small>3. Pondérer et additionner</small><b>/ 100</b><span>Points = score de risque × poids ÷ 100. On additionne les 7 facteurs.</span></div>
+    </div>
+    <p className="frm" style={{marginTop:12}}>Exemple : satisfaction 1,5/5 → tranche « ≤ 2 » → score 100 → 100 × 20 ÷ 100 = <b>20 points</b></p>
+  </C>
+  <C t="Comment calculer le risque de chaque facteur ?" s="Chaque facteur a sa propre grille. Une valeur basse ou haute peut être risquée selon le facteur.">
+    <div className="wrap"><table><thead><tr><th>Facteur</th><th>Ce qu'il mesure</th><th>Conversion en risque (0 à 100)</th><th>Poids</th></tr></thead><tbody>
+      {Object.entries(VARS).map(([k,v])=>{const g=G[k]||GRID[k]
+        return <tr key={k}><td><b>{v.l}</b></td>
+          <td style={{whiteSpace:'normal',minWidth:160}}>{MEASURE[k]}</td>
+          <td style={{whiteSpace:'normal',minWidth:280}}><b>{conv(g)}</b><br/><small className="sub">{g.just}</small></td>
+          <td><input type="number" min="0" max="100" style={{width:70,margin:0}} value={W[k]} onChange={x=>setW({...W,[k]:Math.max(0,+x.target.value||0)})}/> %</td></tr>})}
+      <tr><td colSpan={3}><b>Total des poids</b></td><td><b>{tot} %</b>{tot!==100&&<span className="err"> → ramené à 100</span>}</td></tr>
+    </tbody></table></div>
+    <p className="note">Plus le score de risque est élevé, plus le facteur est préoccupant. La borne supérieure est incluse : « ≤ 2 » signifie 2 inclus. Une valeur absente dans le fichier n'est pas inventée : les poids restants sont ramenés à 100.</p>
+    <button className="btn s sm noprint" onClick={()=>setAdv(!adv)}>{adv?'▲ Masquer la personnalisation':'⚙ Personnaliser les seuils (optionnel)'}</button>
+    {adv&&<div style={{marginTop:12}}>
+      <p className="sub">Modifiez les bornes et les scores : tout le site se recalcule automatiquement.</p>
+      <button className="btn s sm noprint" onClick={reset}>↺ Rétablir les grilles par défaut</button>
+      <div className="grids">
+      {Object.entries(VARS).map(([k,v])=>{const st=stats[k],g=G[k]||GRID[k]
+        return <details className="gridcard" key={k}>
+          <summary><b>{v.l}</b> <span className="sub">· {g.u}</span></summary>
+          <p className="sub">Valeurs observées : {st?`${d3(st.min)} à ${d3(st.max)} (${st.n} salariés)`:'—'}</p>
+          <div className="wrap"><table><thead><tr><th>Tranche</th><th>Borne supérieure</th><th>Score de risque</th><th>Niveau</th></tr></thead><tbody>
+            {g.rows.map((r,i)=>{const lo=i>0?g.rows[i-1].max:-Infinity,last=i===g.rows.length-1
+              return <tr key={i}><td className="frm">{i===0?`≤ ${fin(r.max)}`:last?`> ${fin(lo)}`:`${fin(lo)}–${fin(r.max)}`}</td>
+                <td>{last?<span className="sub">∞</span>:<input type="number" step="0.1" min="0" style={{width:90,margin:0}} value={r.max} onChange={e=>setMax(k,i,e.target.value)}/>}</td>
+                <td><input type="number" min="0" max="100" step="5" style={{width:80,margin:0}} value={r.score} onChange={e=>setScore(k,i,e.target.value)}/> / 100</td>
+                <td><Tag l={riskLvl(r.score)}/></td></tr>})}
+          </tbody></table></div>
+        </details>})}
+      </div>
+    </div>}
+  </C>
+  <C t="Lire le score final" s="Le score sur 100 est comparé à deux seuils pour obtenir un niveau de risque.">
+    <p><Tag l="Faible"/> score &lt; <input type="number" min="1" max="99" style={{width:70}} value={T[0]} onChange={x=>setT([Math.min(+x.target.value||0,T[1]-1),T[1]])}/> · <Tag l="Moyen"/> de {T[0]} à {T[1]-1} · <Tag l="Élevé"/> score ≥ <input type="number" min="2" max="100" style={{width:70}} value={T[1]} onChange={x=>setT([T[0],Math.max(+x.target.value||0,T[0]+1)])}/></p>
+    <p className="frm">Faible si score &lt; {T[0]} · Moyen si {T[0]} ≤ score &lt; {T[1]} · Élevé si score ≥ {T[1]}</p>
+  </C>
+  <C t="Exemple complet : Ines Haddad" s={src&&ines.name?'Salarié de votre base chargée — calcul avec les grilles et poids actuels':'Salarié de référence de la base de démonstration (EMP-011)'}>
+    <div className="ph"><div className="av" style={{background:HEX[ines.lvl]}}>{String(ines.name||ines.id).split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+      <div><h3 style={{margin:0}}>{ines.name||ines.id}</h3><p className="sub" style={{margin:0}}>{ines.id} · {ines.dept} · {ines.job}</p></div></div>
+    <p className="sub">On lit la valeur, on applique la grille, puis on multiplie le score de risque par le poids :</p>
+    <CalcTable e={ines}/>
+    <p className="frm" style={{marginTop:12}}>Total = {ines.all.map(x=>d3(x.pts)).join(' + ')} = {d3(sum)} → score final = <b>{ines.score} / 100</b> → risque <b style={{color:HEX[ines.lvl]}}>{ines.lvl.toUpperCase()}</b></p>
+    <div className="grid g2" style={{marginTop:12}}>
+      <div><p><b>Pourquoi ce score ?</b></p>
+        <p>{ines.name||ines.id} cumule plusieurs facteurs à risque :</p>
+        <ul className="ins">{ines.fac.slice(0,5).map(x=><li key={x.k}><b>{VARS[x.k].l}</b> : {d3(x.v)} {GRID[x.k]?.u} → score {x.s}/100 → {d3(x.pts)} points.</li>)}</ul>
+      </div>
+      <div><p><b>Pistes d'action RH</b></p>
+        <ul className="ins">{ines.fac.slice(0,3).map(x=><li key={x.k}>{VARS[x.k].r}</li>)}</ul>
+        <p className="note" style={{marginBottom:0}}>{NOTE}</p>
+      </div>
+    </div>
+  </C>
+  <C t="À retenir"><ul className="ins"><li>La méthode est <b>simple et vérifiable à la main</b> : une valeur → une tranche → un score → une pondération.</li>
+    <li>Le score final est un <b>indicateur de risque RH</b>, pas une prédiction certaine de démission.</li>
+    <li>Les seuils et les poids sont des hypothèses de départ, à discuter et à valider avec les données historiques de l'entreprise.</li></ul></C></>}
 
 export function Compare({d,src,go,loadDemo}){
   const[a,setA]=useState(''),[b,setB]=useState('')
